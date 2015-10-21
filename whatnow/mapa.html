@@ -75,7 +75,9 @@ window.onload = function() {
 			mapPosX+=32;
 		}
 		mapPosY+=32;
-	}
+	}mapPosX=0;
+        mapPosY=0;
+
     }
 	
     desenhaMapa();
@@ -86,6 +88,7 @@ window.onload = function() {
         alert("Bateste foi.");
         personY=1;
         personX=1;
+        desenhaMapa();
         ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
     }
     
