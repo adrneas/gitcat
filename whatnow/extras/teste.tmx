@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" nextobjectid="1">
+ <tileset firstgid="1" name="Castle_2" tilewidth="32" tileheight="32" tilecount="256">
+  <image source="Castle_2.png" width="512" height="512"/>
+ </tileset>
+ <layer name="terrain" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJztlFEKgCAQRPf+twrKE5QnKE9QfWfQgi0qC679NA/m+zmDLBH4O0MlvV1zzJLEd/DmXJOII5vOuQ2lS8ZTu1vTseZu9Y5Kn9y71bvGbB962b3HHKTrfb8vGHjZrdnbPe87jb28dymB3n/fgnTvUrin5e2o3cXedxIAAAD4kgsyqn5d
+  </data>
+ </layer>
+ <layer name="tower" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJztzckNQGAABWE3SwOWBiwNWBqQaIAoAFGA+s3h70DyXN4k33miyLl/ipEgRSb85ihQohJ+azRo0Qm/PQaMmITfGVuwCL8rjvDdhd8TDy7cwq9zzjnn3JdelZ8GaA==
+  </data>
+ </layer>
+ <layer name="details" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUDBdwCohPYxGvAOIuGtp7C4hvI/HboXQHEM9CEt9EQzcMNtA20A4YBaNgFIyCUTAKRsEoIAIAAIXaBy4=
+  </data>
+ </layer>
+</map>

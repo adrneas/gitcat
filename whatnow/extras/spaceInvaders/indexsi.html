@@ -1,0 +1,558 @@
+<script>
+///////////////////////////////////////////////////////////////////////////////
+//.....Trabalho do GA da Disciplina de Desenvolvimento para Web..............//
+//........................UNISINOS - 2013/01.................................//
+//..........................Space Invaders...................................//
+//..........................Ralf G. Hennig...................................//
+///////////////////////////////////////////////////////////////////////////////
+</script>
+<html>
+<head>
+<style>
+#myCanvas
+{
+	border-style:dotted;
+}
+#canvas2
+{
+	border-style:dotted;
+}
+#menu
+{
+	width:600;
+	margin-left:auto;
+	margin-right:auto;
+}
+#percursos
+{
+	float:left;
+	border-style:solid;
+	width:200;
+	background-color:green;
+}
+#pontuacao
+{
+	float:left;
+	border-style:solid;
+	width:200;
+	background-color:green;
+}
+#vidas
+{
+	float:right;
+	border-style:solid;
+	background-color:yellow;
+}
+</style>
+<title>
+Space Invaders Clone
+</title>
+</head>
+<body>
+<div id="menu">
+<div id="pontuacao">
+Pontuação: 0
+</div>
+<div id="percursos">
+Percursos: 
+</div>
+<div id="vidas">
+Vidas: 3
+</div>
+</div>
+<center>
+<canvas id="myCanvas" width="600" height="600"></canvas> 
+</center>
+
+
+<script>
+//canvas e divs da tela
+var canvas=document.getElementById("myCanvas");
+
+var ctx=canvas.getContext("2d");
+
+var divPlacar=document.getElementById("pontuacao");
+
+var divVidas=document.getElementById("vidas");
+
+var divPercursos=document.getElementById("percursos");
+
+//variaveis para desenho
+var gameover=false;
+
+//variavel para controlar se o jogo já começou(evitar múltiplos "enters")
+var jogando=false;
+
+//variavel para controlar o timer do "pressione enter para começar"
+var pisca;
+
+//variaveis para o mapa 
+var iMapa=new Image();
+iMapa.src="fundo.png";
+var ajustaM=-1;
+//quantidade de linhas e colunas do tilemap
+var lMapa=15;
+var cMapa=15;
+//altura e largura de cada tile em pixels
+var tileAlt=40;
+var tileLar=40;
+var tLin=3;
+
+//variaveis para o player
+var iChar=new Image();
+iChar.src="sin.png";
+var iniColTile=120;
+var iniLinTile=0;
+var largTile=40;
+var altTile=40;
+var posDesColTile=240;
+var posDesLinTile=520;
+var largDesTile=40;
+var altDesTile=40;
+var posAtX=0;
+var posAtY=0;
+var pDir=1;
+var pCim=1;
+var pBai=1;
+var pEsq=1;
+var passo=40;
+
+//variaveis para os aliens
+var colAl1=0;
+var colAl2=40;
+var colAl3=80;
+var colMort=200;
+var desCol=40;
+var desLin=40;
+var desLin2=80;
+
+//array de aliens
+aliensVivos=[99,01,02,03,04,05,06,07,08,09,10,11,99,
+			 99,14,15,16,17,18,19,20,21,22,23,24,99,
+			 99,27,28,29,30,31,32,33,34,35,36,37,99];
+
+//quantidade de vezes que os aliens chegam ao lado direito da tela
+var percurso=0;
+
+//quantidade de vezes máxima que os aliens podem fazer o percurso antes de terminar o jogo(passar de nível zera o percurso)
+var fimPercurso=20;
+
+//velocidade de movimento dos aliens(1000==1s)
+velAliens=500;
+
+//variaveis para tiro
+var colTiro=160;
+var desLinTiro=posDesLinTile-40;
+//variavel para evitar multiplos tiros
+var atirando=false;
+var posColTiroAlien;
+//variaveis para o menu
+var pontos=0;
+var vidas=3;
+
+function tiroAlien()
+{
+if(!gameover)
+{
+	var posColTiroAlien;
+	posColTiroAlien= (Math.floor((Math.random()*11)+1))*40;
+	desTAlien=desLin+40;
+	var timer=setInterval(function() {
+			ctx.drawImage(iChar,colTiro,iniLinTile,largTile,altTile,posColTiroAlien,desTAlien,largDesTile,altDesTile); 
+			desTAlien+=40;
+			var timer2=setTimeout(function() {
+				desenhaMapa();
+				desenhaPlayer(iChar,iniColTile,iniLinTile,largTile,altTile,posDesColTile,posDesLinTile,largDesTile,altDesTile);
+				desenhaAliens();
+				clearTimeout(timer2);
+			},50);
+			if(desTAlien>500)
+			{
+				//termina o timer, muda o atirando para permitir novo tiro e verifica se matou alien
+				clearInterval(timer);
+				mataPlayer(posColTiroAlien);
+			}
+		},80);
+		desTAlein=posDesLinTile+40;
+}
+}
+
+function atira()
+{
+if(!gameover)
+{		
+		atirando=true;
+		//variavel para evitar que o tiro siga a coluna da nave
+		posColTiro=posDesColTile;
+		var timer=setInterval(function() {
+			ctx.drawImage(iChar,colTiro,iniLinTile,largTile,altTile,posColTiro,desLinTiro,largDesTile,altDesTile); 
+			desLinTiro-=40;
+			var timer2=setTimeout(function() {
+				desenhaMapa();
+				desenhaPlayer(iChar,iniColTile,iniLinTile,largTile,altTile,posDesColTile,posDesLinTile,largDesTile,altDesTile);
+				desenhaAliens();
+				clearTimeout(timer2);
+			},50);
+			if(desLinTiro<desLin+60)
+			{
+				//termina o timer, muda o atirando para permitir novo tiro e verifica se matou alien
+				clearInterval(timer);
+				atirando=false;
+				mataAlien(posColTiro);
+			}
+		},80);
+		desLinTiro=posDesLinTile-40;
+}
+}
+
+function movAliensEsq()
+{
+if(!gameover)
+{
+	tiroAlien();
+	var tempo=setInterval(function(){
+		if((aliensVivos[0]==99)&&(aliensVivos[13]==99)&&(aliensVivos[26]==99))
+		{
+			aliensVivos.shift();
+			for(i=0;i<aliensVivos.length;i++)
+			{
+				if(aliensVivos[i]!=99)
+				aliensVivos[i]=aliensVivos[i]-1;
+			}
+			aliensVivos.push(99);
+			desenhaMapa();
+			desenhaAliens();
+			desenhaPlayer(iChar,iniColTile,iniLinTile,largTile,altTile,posDesColTile,posDesLinTile,largDesTile,altDesTile);
+		}
+		else
+		{
+			clearInterval(tempo);
+			movAliensDir();
+		}
+	},velAliens);
+	percurso++;
+	var resPercurso=fimPercurso-percurso;
+	divPercursos.innerHTML="Percursos: "+resPercurso;
+	pontos-=10;
+	if(percurso%3==0)
+	desLin+=40;
+	if(percurso==10)
+	{
+	velAliens-=100;
+	}
+	if(percurso==fimPercurso){
+	alert("Voce perdeu!");
+	gameOver();
+	}
+}
+}
+
+function movAliensDir()
+{
+if(!gameover)
+{
+		tiroAlien();
+		var tempo2=setInterval(function(){
+		if((aliensVivos[12]==99)&&(aliensVivos[25]==99)&&(aliensVivos[38]==99))
+		{
+		aliensVivos.pop();			
+			for(i=0;i<aliensVivos.length;i++)
+			{
+				if(aliensVivos[i]!=99)
+				aliensVivos[i]=aliensVivos[i]+1;
+			}
+			aliensVivos.unshift(99);
+			desenhaMapa();
+			desenhaAliens();
+			desenhaPlayer(iChar,iniColTile,iniLinTile,largTile,altTile,posDesColTile,posDesLinTile,largDesTile,altDesTile);
+		}
+		else
+		{
+			clearInterval(tempo2);
+			movAliensEsq();
+		}
+		},velAliens);
+}
+}
+
+function desenhaAliens()
+{
+if(!gameover)
+{	
+	for(i=0;i<13;i++)
+	{
+		if(aliensVivos[i]==i)
+		{
+			ctx.drawImage(iChar,colAl1,iniLinTile,largTile,altTile,desCol,desLin,largDesTile,altDesTile);
+			desCol+=40;
+		}
+		else {
+			ctx.drawImage(iChar,colMort,iniLinTile,largTile,altTile,desCol,desLin,largDesTile,altDesTile);
+			desCol+=40;
+		}
+	}
+	desCol=40;
+	for(i=13;i<26;i++)
+	{
+		if(aliensVivos[i]==i)
+		{
+			ctx.drawImage(iChar,colAl2,iniLinTile,largTile,altTile,desCol,desLin+40,largDesTile,altDesTile);
+			desCol+=40;
+		}
+		else {
+			ctx.drawImage(iChar,colMort,iniLinTile,largTile,altTile,desCol,desLin+40,largDesTile,altDesTile);
+			desCol+=40;
+		}
+	}
+	desCol=40;
+	
+		for(i=26;i<39;i++)
+	{
+		if(aliensVivos[i]==i)
+		{
+			ctx.drawImage(iChar,colAl3,iniLinTile,largTile,altTile,desCol,desLin+80,largDesTile,altDesTile);
+			desCol+=40;
+		}
+		else {
+			ctx.drawImage(iChar,colMort,iniLinTile,largTile,altTile,desCol,desLin+80,largDesTile,altDesTile);
+			desCol+=40;
+		}
+	}
+	desCol=40;
+}	
+}
+
+function mataAlien(pos)
+{
+		aliensMortos=0;
+		//verifica se a posição do tiro acerta algum alien vivo e se sim, aumenta a pontuação
+		if(aliensVivos[(pos/40)-1+26]!=99)
+		{
+			pontos+=100;
+			divPlacar.innerHTML="Pontuação:  "+pontos;
+			aliensVivos[(pos/40)-1+26]=99;
+		}else{
+			if(aliensVivos[(pos/40)-1+13]!=99)
+			{
+				pontos+=100;
+				divPlacar.innerHTML="Pontuação:  "+pontos;
+				aliensVivos[(pos/40)-1+13]=99;
+			}else{
+				if(aliensVivos[(pos/40)-1]!=99)
+				{
+					pontos+=100;
+					divPlacar.innerHTML="Pontuação:  "+pontos;
+					aliensVivos[(pos/40)-1]=99;
+				}
+			}
+		}
+		//adiciona 99("morto") ao array de aliens para a posição do tiro
+		//verifica a quantidade de aliens mortos no array, caso sejam todos dá a vitória ao player
+		for(i=0;i<aliensVivos.length;i++)
+		{
+			if(aliensVivos[i]==99)
+			aliensMortos++;
+		}
+		if (aliensMortos==39)
+		{
+			passaNivel();
+			//alert("Parabens! Voce venceu o jogo!");	
+			//gameOver();
+		}
+}
+
+function passaNivel()
+{
+	aliensVivos=[99,01,02,03,04,05,06,07,08,09,10,11,99,
+				 99,14,15,16,17,18,19,20,21,22,23,24,99,
+				 99,27,28,29,30,31,32,33,34,35,36,37,99];
+	desCol=40;
+	desLin=40;
+	percurso=0;
+	clearInterval(tempo);
+	clearInterval(tempo2);
+	comecaJogo();
+	
+}
+
+function mataPlayer(pos)
+{
+	if(pos==posDesColTile)
+	{
+		vidas--;
+		alert("Voce morreu!");
+		divVidas.innerHTML="Vidas: "+vidas;
+		if(vidas<0)
+		gameOver();
+	}
+}
+
+function gameOver()
+{
+	var col123=10;
+	gameover=true;
+	ctx.font="50px Arial";
+	var grd=ctx.createLinearGradient(0,0,200,0);
+	grd.addColorStop(0,"red");
+	grd.addColorStop(1,"gray");
+	var abc=setInterval(function() {
+		ctx.fillStyle=grd;
+		ctx.fillRect(0,0,600,600);
+		ctx.strokeText("Fim de Jogo!",col123,300);
+		ctx.fillStyle="black";
+		ctx.fillText("Fim de Jogo!",col123+2,302);
+		col123+=5;	
+		var pont=pontos;//+vidas*1000;
+		ctx.strokeText("Pontuação:"+pont,col123-50,450);
+		ctx.fillStyle="black";
+		ctx.fillText("Pontuação:"+pont,col123-48,452);
+		col123+=5;
+		if(col123==180)
+		{
+			clearInterval(abc);
+		}
+	},50);
+}
+
+//escuta teclado
+window.addEventListener('keydown',qTecla,true);
+
+//movimentando heroi
+function qTecla(e)
+{
+	switch(e.keyCode) {
+		//espaço
+		case 32:
+		{
+			if(!atirando)
+			atira();
+		}
+		break;
+		//direita
+		case 39:
+		{
+			desenhaMapa();
+			andaDireita();
+		}	
+		break;
+		//esquerda
+		case 37:
+		{
+			desenhaMapa();
+			andaEsquerda();	
+		}
+		break;
+		//ctrl
+		case 17:
+		{
+			iMapa.src="fundo2.png";
+			iChar.src="si0.png";
+		}
+		break;
+		//enter
+		case 13:
+		{
+			if(!jogando)
+			comecaJogo();
+		}
+		break;
+}
+}
+
+function andaDireita()
+{
+	desenhaMapa();
+	if((posDesColTile<520))
+	{
+		desenhaPlayer(iChar,iniColTile,iniLinTile,largTile,altTile,posDesColTile+passo,posDesLinTile,largDesTile,altDesTile);
+		posDesColTile+=passo;
+	}
+	else{
+		desenhaPlayer(iChar,iniColTile,iniLinTile,largTile,altTile,posDesColTile,posDesLinTile,largDesTile,altDesTile);
+	}
+	desenhaAliens();
+}
+
+function andaEsquerda()
+{	
+	desenhaMapa();
+	if((posDesColTile>40))
+	{
+		desenhaPlayer(iChar,iniColTile,iniLinTile,largTile,altTile,posDesColTile-passo,posDesLinTile,largDesTile,altDesTile);
+		posDesColTile-=passo;
+	}
+	else{
+			desenhaPlayer(iChar,iniColTile,iniLinTile,largTile,altTile,posDesColTile,posDesLinTile,largDesTile,altDesTile);
+	}
+	desenhaAliens();
+}
+
+function comecaJogo()
+{
+	    clearInterval(pisca);
+		jogando=true;
+		gameover=false;
+		ctx.beginPath();
+		desenhaMapa();
+		desenhaPlayer(iChar,iniColTile,iniLinTile,largTile,altTile,posDesColTile,posDesLinTile,largDesTile,altDesTile);	
+		desenhaAliens();
+		movAliensEsq();	
+}
+
+function menu()
+{		
+	var col123=10;
+	gameover=true;
+	ctx.font="45px Arial";
+	ctx.fillStyle="gray";
+	ctx.fillRect(0,0,600,600);
+	ctx.strokeText("Desenvolvimento para Web",col123,100);
+	ctx.fillStyle="black";
+	ctx.fillText('"Space Invaders"',150,200);
+	ctx.font="30px Arial";
+	ctx.fillText("Ralf G. Hennig",300,250);
+	ctx.font="30px Arial";
+	ctx.strokeText("Direcionais: movimentam a nave",50,350);
+	ctx.strokeText("Espaço: atira",50,400);
+	ctx.strokeText("Ctrl: muda para estilo clássico", 50, 450);
+	var cor=0;
+	pisca=setInterval(function() {
+		if(cor%2==0)
+		{
+			ctx.font="20px Arial";
+			ctx.fillStyle="black";
+			ctx.fillText("Pressione enter para começar",130,540);
+			cor++;
+		} else{
+			ctx.font="20px Arial";
+			ctx.fillStyle="gray";
+			ctx.fillText("Pressione enter para começar",130,540);
+			cor++;
+			}
+		},400);
+	var t=0;
+}
+ 
+//function para desenhar o mapa
+//informar variavel da tilesheet, tamanho da imagem, tamanho da tile, tamanho da coluna, array do tilemap
+function desenhaMapa()
+{
+	if(!gameover)
+	{
+		ctx.drawImage(iMapa,0,0);	
+	}
+}
+
+//desenha personagem
+function desenhaPlayer(im,iCT,iLT,lT,aT,pDCT,pDLT,lDT,aDT)
+{
+	if(!gameover){
+	ctx.drawImage(im,iCT,iLT,lT,aT,pDCT,pDLT,lDT,aDT);
+	}
+}
+
+menu();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<html>
+<head>
+    <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+    <title>bananaman</title>
+
+    <style type="text/css">
+    
+        #mototaxi { position:fixed; left:50%; margin-left:-256px; top:50%; margin-top:-256px; }
+    
+    </style>
+</head>
+  <body>  
+    <img id="tile" src="planettile.png" style="display:none;">
+    
+      
+      
+      <canvas id="mototaxi" width="512" height="512" style="border:1px solid #000000;">
+    
+    </canvas>
+      
+      
+<script>
+    
+
+
+window.onload = function() {
+	
+	var canvas = document.getElementById("mototaxi");
+	var ctx = canvas.getContext("2d");
+	var img = document.getElementById("tile");
+    var personImg = ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
+	
+	var personX=1;
+	var personY=1;
+	
+	var personPos = [personX][personY];
+	
+	
+	
+	var mapPosX=0;
+	var mapPosY=0;
+	
+	var map = [
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1],
+	[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+	[1,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1],
+	[1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1],
+	[1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+	[1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1],
+	[1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
+	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
+	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
+	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
+	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
+	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
+	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
+	[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+	];
+	
+	//desenha mapa
+	function desenhaMapa(){
+	for(var i=0; i<map.length; i++){
+		mapPosX=0;
+		for(var k=0; k<map[i].length; k++){
+			if (map[i][k]==0){
+				
+				ctx.drawImage(img,0,0,32,32,mapPosX,mapPosY,32,32);
+			}
+			else{
+				ctx.drawImage(img,32,0,32,32,mapPosX,mapPosY,32,32);
+				
+			}
+			mapPosX+=32;
+		}
+		mapPosY+=32;
+	}
+    }
+	
+    desenhaMapa();
+    
+	ctx.drawImage(img,64,0,32,32,32,32,32,32);
+    
+	function colision(){
+        alert("Bateste foi.");
+        personY=1;
+        personX=1;
+        ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
+    }
+    
+    function movePersonUp(){
+        console.log(personY);
+        personY--;
+        if (map[personY][personX]==1){
+            colision();
+        }else{
+            desenhaMapa();
+            ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
+        }
+    }
+    function movePersonDown(){
+        console.log(personY);
+        personY++;
+        if (map[personY][personX]==1){
+            colision();
+        }else{
+            desenhaMapa();
+            ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
+        }
+    }
+    function movePersonRight(){
+        console.log(personY);
+        personX++;
+        if (map[personY][personX]==1){
+            colision();
+        }else{
+            desenhaMapa();
+            ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
+        }
+    }
+    
+    function movePersonLeft(){
+        console.log(personY);
+        personX--;
+        if (map[personY][personX]==1){
+            colision();
+        }else{
+            desenhaMapa();
+            ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
+        }
+    }
+        
+        
+    
+    
+    
+	$(function(){
+		$(document).keyup(function(e){
+			if(e.keyCode==38){ //move pra cima
+				movePersonUp();
+                }else if(e.keyCode==40){ //move pra baixo
+                    movePersonDown();
+                }else if(e.keyCode==39){ // move pra direita
+                    movePersonRight();
+                }else if(e.keyCode==37){ // move pra esquerda
+                    movePersonLeft();
+                }
+				
+			
+			
+		});
+		
+	});
+	
+}
+
+</script>
+    
+
+    </body>
+</html>
