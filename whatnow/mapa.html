@@ -14,7 +14,7 @@
     
       
       
-      <canvas id="mototaxi" width="512" height="512" style="border:1px solid #000000;">
+      <canvas id="mototaxi" width="544" height="544" style="border:1px solid #000000;">
     
     </canvas>
       
@@ -29,35 +29,21 @@ window.onload = function() {
 	var ctx = canvas.getContext("2d");
 	var img = document.getElementById("tile");
     var personImg = ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
-	
-	var personX=1;
-	var personY=1;
+    
+	var tileArray=[1,0,0];
+    
+	var personX=8;
+	var personY=8;
 	
 	var personPos = [personX][personY];
 	
+    var newLine=[];
 	
 	
 	var mapPosX=0;
 	var mapPosY=0;
 	
-	var map = [
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1],
-	[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-	[1,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1],
-	[1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1],
-	[1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
-	[1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1],
-	[1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
-	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
-	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
-	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
-	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
-	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
-	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
-	[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-	];
+	var map = [];
 	
 	//desenha mapa
 	function desenhaMapa(){
@@ -75,25 +61,64 @@ window.onload = function() {
 			mapPosX+=32;
 		}
 		mapPosY+=32;
-	}mapPosX=0;
-        mapPosY=0;
-
+	}
+    mapPosX=0;
+    mapPosY=0;
     }
 	
+    map = [
+	[1,1,0,0,0,0,1,1,0,0,0,1,0,0,0,1,1],
+	[1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1],
+	[0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0],
+	[1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0],
+	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+	[0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
+	[0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
+	[0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[1,0,1,0,0,1,0,0,0,1,0,0,1,0,0,0,1]
+	];
+    
     desenhaMapa();
     
-	ctx.drawImage(img,64,0,32,32,32,32,32,32);
+	ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
     
 	function colision(){
         alert("Bateste foi.");
-        personY=1;
-        personX=1;
+        map = [
+	[1,1,0,0,0,0,1,1,0,0,0,1,0,0,0,1,1],
+	[1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1],
+	[0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0],
+	[1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0],
+	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+	[0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+	[1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
+	[0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
+	[0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[1,0,1,0,0,1,0,0,0,1,0,0,1,0,0,0,1]
+	];
+        console.log(newLine);
         desenhaMapa();
         ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
     }
     
-    function movePersonUp(){
-        console.log(personY);
+    //MOVIMENTAÇÃO ANTIGA
+    
+    /*function movePersonUp(){
         personY--;
         if (map[personY][personX]==1){
             colision();
@@ -103,7 +128,6 @@ window.onload = function() {
         }
     }
     function movePersonDown(){
-        console.log(personY);
         personY++;
         if (map[personY][personX]==1){
             colision();
@@ -113,7 +137,6 @@ window.onload = function() {
         }
     }
     function movePersonRight(){
-        console.log(personY);
         personX++;
         if (map[personY][personX]==1){
             colision();
@@ -124,7 +147,6 @@ window.onload = function() {
     }
     
     function movePersonLeft(){
-        console.log(personY);
         personX--;
         if (map[personY][personX]==1){
             colision();
@@ -132,9 +154,82 @@ window.onload = function() {
             desenhaMapa();
             ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
         }
-    }
+    }*/
         
-        
+    
+    
+        //NOVA MOVIMENTAÇÃO (MOVENDO E GERANDO MUNDO NOVO)
+    
+        function movePersonUp(){
+            newLine=[];
+            for(var i=0; i<map.length;i++){ 
+                newLine.push(tileArray[Math.floor(Math.random() * tileArray.length)]);    
+            }
+            
+            map.unshift(newLine); //adiciona newLine como primeira posiçao do array
+            map.pop(); //deleta o ultimo termo do array
+            
+            if (map[personY][personX]==1){
+                colision();
+                
+            }else{
+                desenhaMapa();
+                ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
+            }     
+        }
+    
+        function movePersonDown(){
+            newLine=[];
+            for(var i=0; i<map.length;i++){ 
+                newLine.push(tileArray[Math.floor(Math.random() * tileArray.length)]);    
+            }
+            
+            map.push(newLine); //adiciona newLine como ultimo termo do array
+            map.shift(); //deleta o primeiro termo do array
+            
+            if (map[personY][personX]==1){
+                colision();
+                
+            }else{
+                desenhaMapa();
+                ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
+            }  
+        }
+    
+        function movePersonRight(){
+            
+            for(var i=0; i<map.length;i++){
+                map[i].splice(0,1); //deleta o primeiro termo do array
+                map[i].push(tileArray[Math.floor(Math.random() * tileArray.length)]); // adiciona o valor randomizado no final do array
+            }
+            
+            
+            if (map[personY][personX]==1){
+                colision();
+                
+            }else{
+                desenhaMapa();
+                ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
+            }  
+        }
+    
+        function movePersonLeft(){
+           
+            for(var i=0; i<map.length;i++){
+                map[i].pop; // deleta o último termo do array
+                map[i].unshift(tileArray[Math.floor(Math.random() * tileArray.length)]); // adiciona o valor randomizado no início do array
+            }
+            
+            
+            if (map[personY][personX]==1){
+                colision();
+                
+            }else{
+                desenhaMapa();
+                ctx.drawImage(img,64,0,32,32,personX*32,personY*32,32,32);
+            }  
+        }
+    
     
     
     
